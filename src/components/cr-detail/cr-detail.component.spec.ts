@@ -30,5 +30,13 @@ describe('CrDetailComponent', () => {
 		const fixture = await render(users.viewer, 'CR-1'); // viewer: cr_r_o only; CR-1 is PENDING_APPROVAL
 		const approveBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.cr-actions__approve');
 		expect(approveBtn.disabled).toBe(true);
+		expect(fixture.nativeElement.querySelector('.cr-actions__reject')).toBeNull();
+	});
+
+	it('allows an approver to approve and reject a pending CR', async () => {
+		const fixture = await render(users.approver, 'CR-1');
+		const approveBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.cr-actions__approve');
+		expect(approveBtn.disabled).toBe(false);
+		expect(fixture.nativeElement.querySelector('.cr-actions__reject')).not.toBeNull();
 	});
 });
