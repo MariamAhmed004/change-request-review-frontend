@@ -62,8 +62,10 @@ export class CrDetailComponent implements OnInit, OnChanges {
 
 	/** Approval timeline, oldest-first. */
 	get timeline(): TimelineEntry[] {
-		// TODO: return the audit entries ordered chronologically (oldest first).
-		return this.detail?.audit ?? [];
+		// Sort audit entries by timestamp (oldest first).
+		return this.detail?.audit
+        ?.slice()
+        .sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime()) ?? [];
 	}
 
 	/** Whether the current user may approve the loaded CR. */
