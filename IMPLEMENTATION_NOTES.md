@@ -16,6 +16,7 @@
 
 - Task 1: Fixed the changed flag for a line item in (diff.spec.ts): modified the changed flag to be true when the description or the unit price of an item is changed, rather than only detecting quantity changes. Additionally, Updated the approval and rejection permissions in cr-detail.component.ts and cr-detail.component.spec.ts by reusing the existing approval policy check for both actions. The component now evaluates the current session user's permissions in addition to the CR status before allowing changes. 
 - Task 2: Implemented the filter by status logic for CR list in (cr-list.component.ts)
+- Task 3:
 
 ## 2. Component & state model
 <!-- The screens, the view-state each component exposes, and how data flows from the mock API into the
@@ -25,6 +26,7 @@ template. -->
 - cr-detail.component displays the selected change request details, line item comparison, and audit timeline.
 - Data is loaded from the mock API service using the provided fixtures and rendered in the corresponding components.
 - Status filtering updates visibleRows, which drives the rows displayed in the list view.
+- cr-detail.component loads and displays the selected change request from the mock API, and refreshes its state when the selected request ID changes.
 
 ## 3. Invariants I keep
 <!-- Which properties the UI guarantees, and where in the component/template each is enforced. -->

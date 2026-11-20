@@ -13,7 +13,7 @@ async function render(user: ReqUser, id: string): Promise<ComponentFixture<CrDet
 	});
 	await TestBed.compileComponents();
 	const fixture = TestBed.createComponent(CrDetailComponent);
-	fixture.componentInstance.id = id;
+	fixture.componentRef.setInput('id', id);
 	fixture.detectChanges(); // ngOnInit -> load()
 	await flush(); // let the mock API resolve
 	fixture.detectChanges(); // render the loaded state
@@ -24,6 +24,16 @@ describe('CrDetailComponent', () => {
 	it('loads and renders the change request title', async () => {
 		const fixture = await render(users.approver, 'CR-1');
 		expect(fixture.nativeElement.querySelector('.cr-detail__header h2').textContent).toContain('Add 1 unit of SKU-A');
+	});
+
+	it('loads the selected request when its id changes', async () => {
+		const fixture = await render(users.approver, 'CR-1');
+		fixture.componentRef.setInput('id', 'CR-2');
+		fixture.detectChanges();
+		await flush();
+		fixture.detectChanges();
+
+		expect(fixture.nativeElement.querySelector('.cr-detail__header h2').textContent).toContain('Replace SKU-B supplier');
 	});
 
 	it('disables Approve for a read-only viewer on a pending CR', async () => {
