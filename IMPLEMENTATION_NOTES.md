@@ -26,7 +26,8 @@ template. -->
 - cr-detail.component displays the selected change request details, line item comparison, and audit timeline.
 - Data is loaded from the mock API service using the provided fixtures and rendered in the corresponding components.
 - Status filtering updates visibleRows, which drives the rows displayed in the list view.
-- cr-detail.component loads and displays the selected change request from the mock API, and refreshes its state when the selected request ID changes.
+- cr-detail.component reloads change request data when the selected request ID changes and exposes the request details, timeline, diff preview, and action state to the template.
+- The approval timeline is derived from audit entries and presented chronologically.
 
 ## 3. Invariants I keep
 <!-- Which properties the UI guarantees, and where in the component/template each is enforced. -->

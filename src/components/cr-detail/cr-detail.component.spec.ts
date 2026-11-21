@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CrDetailComponent } from './cr-detail.component';
 import { SessionService } from '../../session/session.service';
+import { CrApiService } from '../../api/cr-api.service';
 import { users } from '../../api/fixtures';
 import { ReqUser } from '../../models/cr.models';
 
@@ -48,5 +49,49 @@ describe('CrDetailComponent', () => {
 		const approveBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.cr-actions__approve');
 		expect(approveBtn.disabled).toBe(false);
 		expect(fixture.nativeElement.querySelector('.cr-actions__reject')).not.toBeNull();
+	});
+
+	// test the approve and reject flows, including validation and error handling
+	it('approves the request and reflects the updated status and timeline', async () => {
+		const fixture = await render(users.approver, 'CR-1');
+		await fixture.componentInstance.approve();
+		fixture.detectChanges();
+
+		expect(fixture.nativeElement.querySelector('.cr-status').textContent).toContain('APPROVED');
+		expect(fixture.nativeElement.querySelector('.cr-actions__reject')).toBeNull();
+		expect(
+			Array.from(fixture.nativeElement.querySelectorAll('.cr-timeline__action')).some((node: Element) =>
+				node.textContent?.includes('APPROVE'),
+			),
+		).toBe(true);
+	});
+
+	it('requires a rejection reason and reflects a successful rejection', async () => {
+		const fixture = await render(users.approver, 'CR-1');
+		const component = fixture.componentInstance;
+
+		await component.reject();
+		expect(component.rejectControl.touched).toBe(true);
+		expect(component.detail?.status).toBe('PENDING_APPROVAL');
+
+		component.rejectControl.setValue('Incorrect pricing');
+		await component.reject();
+		fixture.detectChanges();
+
+		expect(fixture.nativeElement.querySelector('.cr-status').textContent).toContain('REJECTED');
+		expect(fixture.nativeElement.querySelector('.cr-actions__reject')).toBeNull();
+		expect(fixture.nativeElement.querySelector('.cr-timeline__note').textContent).toContain('Incorrect pricing');
+	});
+
+	it('shows API errors when an action fails', async () => {
+		const fixture = await render(users.approver, 'CR-1');
+		TestBed.inject(CrApiService).failNext = true;
+
+		await fixture.componentInstance.approve();
+		fixture.detectChanges();
+
+		expect(fixture.componentInstance.detail?.status).toBe('PENDING_APPROVAL');
+		expect(fixture.nativeElement.querySelector('.cr-actions__error').textContent).toContain('Network error');
+		expect(fixture.componentInstance.submitting).toBe(false);
 	});
 });
