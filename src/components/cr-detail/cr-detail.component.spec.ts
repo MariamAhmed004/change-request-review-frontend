@@ -7,24 +7,56 @@ import { ReqUser } from '../../models/cr.models';
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
-async function render(user: ReqUser, id: string): Promise<ComponentFixture<CrDetailComponent>> {
+async function create(
+	user: ReqUser,
+	id: string,
+	configureApi?: (api: CrApiService) => void,
+): Promise<ComponentFixture<CrDetailComponent>> {
 	TestBed.configureTestingModule({
 		imports: [CrDetailComponent],
 		providers: [{ provide: SessionService, useValue: { user } }],
 	});
 	await TestBed.compileComponents();
+	if (configureApi) {
+		configureApi(TestBed.inject(CrApiService));
+	}
 	const fixture = TestBed.createComponent(CrDetailComponent);
 	fixture.componentRef.setInput('id', id);
 	fixture.detectChanges(); // ngOnInit -> load()
+	return fixture;
+}
+
+async function render(user: ReqUser, id: string): Promise<ComponentFixture<CrDetailComponent>> {
+	const fixture = await create(user, id);
 	await flush(); // let the mock API resolve
 	fixture.detectChanges(); // render the loaded state
 	return fixture;
 }
 
 describe('CrDetailComponent', () => {
+	it('shows the loading state while the detail request is pending', async () => {
+		const fixture = await create(users.approver, 'CR-1', (api) => {
+			api.latencyMs = 50;
+		});
+		expect(fixture.nativeElement.querySelector('.cr-detail__loading')).not.toBeNull();
+
+		await new Promise((resolve) => setTimeout(resolve, 60));
+		fixture.detectChanges();
+	});
+
 	it('loads and renders the change request title', async () => {
 		const fixture = await render(users.approver, 'CR-1');
 		expect(fixture.nativeElement.querySelector('.cr-detail__header h2').textContent).toContain('Add 1 unit of SKU-A');
+	});
+
+	it('shows the error state when loading the detail fails', async () => {
+		const fixture = await create(users.approver, 'CR-1', (api) => {
+			api.failNext = true;
+		});
+		await flush();
+		fixture.detectChanges();
+
+		expect(fixture.nativeElement.querySelector('.cr-detail__error').textContent).toContain('Network error');
 	});
 
 	it('loads the selected request when its id changes', async () => {
