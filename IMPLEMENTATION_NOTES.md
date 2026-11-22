@@ -1,7 +1,5 @@
 # Implementation Notes
 
-> Fill this in as part of your submission. 1–2 pages, bullet points are fine. Delete these
-> instructions before submitting.
 
 ## Task 0 : Initial Description
 - The screen shows a list of change requests for the logged in users' organization and clicking on a row will show the details of the request (initially: clicking on the row does not reload the page).
@@ -16,7 +14,9 @@
 
 - Task 1: Fixed the changed flag for a line item in (diff.spec.ts): modified the changed flag to be true when the description or the unit price of an item is changed, rather than only detecting quantity changes. Additionally, Updated the approval and rejection permissions in cr-detail.component.ts and cr-detail.component.spec.ts by reusing the existing approval policy check for both actions. The component now evaluates the current session user's permissions in addition to the CR status before allowing changes. 
 - Task 2: Implemented the filter by status logic for CR list in (cr-list.component.ts)
-- Task 3:
+- Task 3: Implemented the detail UI behavior, including a chronological timeline, synchronized detail loading, permission-aware approve and reject actions with validation, and error handling.
+- Task 4: Kept role and permission behavior intact and ensured loading, empty, and error states are explicitly represented with appropriate messages.
+- Task 5: Added and updated spec tests to cover the implemented behaviors, including filtering, states, timelines, permissions, action flows, validation, and error handling.
 
 ## 2. Component & state model
 <!-- The screens, the view-state each component exposes, and how data flows from the mock API into the
@@ -51,7 +51,7 @@ template. -->
 ## 5. Assumptions
 <!-- Where the requirements left room for interpretation, the calls you made and why. -->
 
--
+- I assumed it was acceptable to reset the selected request to null when the user changes, so the detail view doesn’t show a stale or invalid selection. That avoids awkward errors and makes switching between users smoother and more predictable.
 
 ## 6. Where I used AI
 
@@ -59,4 +59,6 @@ template. -->
 - Used AI to review and refine the implementation notes and documentation to improve wording, clarity, and the level of detail presented in this submission.
 
 ## 7. What I'd improve with more time
--
+
+- Hide action buttons when they aren’t applicable instead of just disabling them, so the screen feels cleaner and less confusing.
+- Add a way to view item descriptions and changes, for example a popup or side panel, since the description isn’t shown in the main detail table.
